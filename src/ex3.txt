@@ -1,0 +1,1 @@
+number of clusters: 13, greatest integral:  103493, centroid x:  3.0, centroid y: 23.0
