@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
+Exercise 3:
 Module which find clusters in the picture using recursive functions
 """
 

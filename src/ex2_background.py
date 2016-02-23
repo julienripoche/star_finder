@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
+Exercise 2:
 Module which substract the background from the picure,
 corresponding to the data contained in pixels
 """

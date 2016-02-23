@@ -2,64 +2,64 @@
 # -*- coding: utf-8 -*-
 
 """
-Module which substract the background from the image
+Project 1:
+Module which allows to change the threshold
+with the use of a widget
 """
 
 import sys
-
 import matplotlib.pyplot as plt
 import matplotlib.widgets as widgets
-from astropy.io import fits
-
 import mylib
-
 
 def main():
     """
     Take datas (2D numpy.array) from the fits file specific.fits
-    and display the associated picture, after the background has been removed
+    and display the associated picture without background,
+    the threshold can be ajusted with a widget
     """
 
-    # Create empty variables to prevent exception when opening the file
-    pixels = None
+    # Get pixels and header from a fits file
+    pixels, _ = mylib.get_pixels("../data/specific.fits")
 
-    # Open the fits file common.fits and put data in pixels variable
-    with fits.open("../data/specific.fits") as fits_data:
-        pixels = fits_data[0].data
+    # Process to the fit of the background
+    _, _, _, background, dispersion = mylib.modelling_parameters(pixels)
 
-    # Process the fit of the background
-    x, y, maxvalue, background, dispersion = mylib.modelling_parameters(pixels)
-
-    # remove the background
+    # Remove the background
     filtered_pixels = mylib.remove_background(pixels, background, dispersion)
 
     # Display the picture without the background
     fig, axis = plt.subplots()
-    plt.subplots_adjust(left = 0.1, bottom = 0.25)
+    plt.subplots_adjust(left=0.1, bottom=0.25)
     axis.imshow(filtered_pixels)
     axis.set_title('Picture without background')
 
+    # Define the slider axis and the widget associated
     slider_axis = plt.axes([0.2, 0.1, 0.6, 0.105])
     threshold_min = max(0, background - 6.0 * dispersion)
     threshold_max = background + 10.0*dispersion
     threshold_init = background + 6.0*dispersion
-    my_widget = widgets.Slider(slider_axis, 'threshold', threshold_min, threshold_max, valinit=threshold_init)
+    my_widget = widgets.Slider(slider_axis, 'threshold', threshold_min, \
+                               threshold_max, valinit=threshold_init)
 
-    # On_click definition
+    # slider_action function definition
     def slider_action(threshold):
-        axis.cla()
-        filtered_pixels = mylib.remove_background(pixels, background, dispersion, threshold=threshold)
+        """
+        Function called when the threshold value is changed,
+        the filtered_pixels array is recalculated
+        and the canvas is redrawn
+        """
+        axis.cla() # delete the previous imshow
+        filtered_pixels = mylib.remove_background(pixels, background, \
+                          dispersion, threshold=threshold)
         axis.imshow(filtered_pixels)
-        axis.set_title('Picture without background')
-        fig.canvas.draw() # draw_idle()
+        axis.set_title('Picture without background : threshold = %s' % \
+                      (threshold))
+        fig.canvas.draw() # redraw
 
+    # Use event handler
     my_widget.on_changed(slider_action)
     plt.show()
-
-    # Write the informations of the transformation matrix on ex2.txt file
-    results = 'background: %i, dispersion: %i' % (background, dispersion)
-    with open("ex2.txt", 'w') as output_file:
-        output_file.write(results)
 
     return 0
 

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
+Exercise 1:
 Module that determines the transformation matrix from
 the header of a block of a fits file
 """

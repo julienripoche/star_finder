@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
+Exercise 5:
 Module which find name of star in clusters,
 display the picture, draw bounding box around clusters
 and allow to click on a cluster to have access to

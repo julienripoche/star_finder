@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
+Exercise 4:
 Module which find WCS coordinates of clusters,
 display the picture and show the WCS coordinates
 of the pixel given by the mouse
@@ -61,7 +62,7 @@ def main():
 
     # Write informations about WCS coordinates on ex4.txt file
     results = 'right ascension: %.3f, declination: %.3f' % \
-              (main_clust.centroid_WCS[0], main_clust.centroid_WCS[1])
+              (main_clust.centroid_wcs[0], main_clust.centroid_wcs[1])
     with open("ex4.txt", 'w') as output_file:
         output_file.write(results)
 
