@@ -21,7 +21,7 @@ def main():
     pixels = None
 
     # Open the fits file common.fits and put data in pixels variable
-    with fits.open("../data/common.fits") as fits_data:
+    with fits.open("../data/specific.fits") as fits_data:
         pixels = fits_data[0].data
         header = fits_data[0].header
 
@@ -93,12 +93,13 @@ def main():
     def move(event):
         x_position = event.xdata
         y_position = event.ydata
-        ra, dec = my_wcs.convert_to_radec(x_position, y_position)
-        axis = event.inaxes
-        text = axis.text(x_position, y_position, 'ra: %.6f, dec: %.6f' % (ra, dec), \
-                  fontsize=14, color='white')
-        event.canvas.draw()
-        text.remove()
+        if x_position != None: # We are not outside the picture
+	    ra, dec = my_wcs.convert_to_radec(x_position, y_position)
+            axis = event.inaxes
+            text = axis.text(x_position, y_position, 'ra: %.6f, dec: %.6f' % \
+                            (ra, dec), fontsize=14, color='white')
+            event.canvas.draw()
+            text.remove()
 
     # Use event handler
     fig.canvas.mpl_connect('motion_notify_event', move)
