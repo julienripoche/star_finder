@@ -14,6 +14,18 @@ from scipy.optimize import curve_fit
 
 import library
 
+def get_pixels(path):
+    """
+    Get a numpy.ndarray corresponding to data
+    and an astropy.io.fits.header.Header giving other informations
+    from a fits file located at 'path'
+    """
+    try:
+        with fits.open(path) as fits_data:
+            return fits_data[0].data, fits_data[0].header
+    except:
+        print 'cannot open', path
+        return None, None
 
 def modelling_function(x, maximum, mean, disp):
     """
