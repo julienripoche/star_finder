@@ -24,7 +24,7 @@ def main():
     axis.imshow(pixels)
     plt.show()
 
-    # Write the informations of the transformation matrix on ex1.txt file
+    # Write informations about the transformation matrix on ex1.txt file
     results = 'cd1_1: %.10f, cd1_2: %.10f, cd2_1: %.10f, cd2_2: %.10f' % \
              (header['CD1_1'], header['CD1_2'], \
               header['CD2_1'], header['CD2_2'])

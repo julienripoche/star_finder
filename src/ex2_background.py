@@ -2,55 +2,49 @@
 # -*- coding: utf-8 -*-
 
 """
-Module which substract the background from the image
+Module which substract the background from the picure,
+corresponding to the data contained in pixels
 """
 
 import sys
-
 import matplotlib.pyplot as plt
-from astropy.io import fits
-
 import mylib
-
 
 def main():
     """
     Take datas (2D numpy.array) from the fits file specific.fits
-    and display the associated picture, after the background has been removed
+    and display the associated picture without background
     """
 
-    # Create empty variables to prevent exception when opening the file
-    pixels = None
+    # Get pixels and header from a fits file
+    pixels, _ = mylib.get_pixels("../data/specific.fits")
 
-    # Open the fits file common.fits and put data in pixels variable
-    with fits.open("../data/specific.fits") as fits_data:
-        pixels = fits_data[0].data
+    # Process to the fit of the background
+    x_array, y_array, maxvalue, background, dispersion = \
+        mylib.modelling_parameters(pixels)
 
-    # Process the fit of the background
-    x, y, maxvalue, background, dispersion = mylib.modelling_parameters(pixels)
-
-    # remove the background
+    # Remove the background
     filtered_pixels = mylib.remove_background(pixels, background, dispersion)
 
-    # Plot the data histogram and the result of the fit
-    _, axis = plt.subplots()
-    plt.plot(x, y, 'b+:', label='data')
-    plt.plot(x, mylib.modelling_function(x, maxvalue, background, dispersion), 'r.:', label='fit')
+    # Plot both histograms and picture without background
+    _, axis = plt.subplots(1, 2)
 
-    # put a title and name axis
-    axis.legend()
-    axis.set_title('Flux distribution')
-    axis.set_xlabel('Amplitude')
-    axis.set_ylabel('Frequency')
-    plt.show()
+    # Plot histogram of data luminosity and result of the fit
+    axis[0].plot(x_array, y_array, 'b+:', label='data')
+    axis[0].plot(x_array, mylib.modelling_function( \
+             x_array, maxvalue, background, dispersion), \
+             'r.:', label='fit')
+    axis[0].legend()
+    axis[0].set_title('Flux distribution')
+    axis[0].set_xlabel('Amplitude')
+    axis[0].set_ylabel('Frequency')
 
     # Display the picture without the background
-    _, axis = plt.subplots()
-    axis.imshow(filtered_pixels)
-    axis.set_title('Picture without background')
+    axis[1].imshow(filtered_pixels)
+    axis[1].set_title('Picture without background')
     plt.show()
 
-    # Write the informations of the transformation matrix on ex2.txt file
+    # Write informations about background and dispersion on ex2.txt file
     results = 'background: %i, dispersion: %i' % (background, dispersion)
     with open("ex2.txt", 'w') as output_file:
         output_file.write(results)
