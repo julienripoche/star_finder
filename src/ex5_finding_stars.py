@@ -98,7 +98,7 @@ def main():
     def on_click(event):
         x_position = event.xdata
         y_position = event.ydata
-        if x_position != None:
+        if x_position != None: # We are not outside the picture
             for cluster in cluster_array:
                 if cluster.is_in_bounding(x_position, y_position):
                     axis = event.inaxes
