@@ -1,101 +1,47 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+Module which find WCS coordinates of clusters,
+display the picture and show the WCS coordinates
+of the pixel given by the mouse
+"""
 
-import math
 import sys
-
 import matplotlib.pyplot as plt
-import numpy as np
-from astropy.io import fits
-from scipy.optimize import curve_fit
-
-import library
 import mylib
-
+import library
 
 def main():
-    """ ex 4"""
+    """
+    Take datas (2D numpy.array) from the fits file specific.fits,
+    find the clusters array, find there WCS coordinates, display it
+    """
 
-    # Create empty variables to prevent exception when opening the file
-    pixels = None
+    # Get pixels and header from a fits file
+    pixels, header = mylib.get_pixels("../data/specific.fits")
 
-    # Open the fits file common.fits and put data in pixels variable
-    with fits.open("../data/specific.fits") as fits_data:
-        pixels = fits_data[0].data
-        header = fits_data[0].header
+    # Process to the fit of the background
+    _, _, _, background, dispersion = mylib.modelling_parameters(pixels)
 
-    # Build a flat list of the pixel values
-    pixels_flat = pixels.ravel()
-
-    # build the pixel distribution
-    bin_number = 200
-    # pylint: disable=E
-    bin_values, bin_boundaries = np.histogram(pixels_flat, bin_number)
-
-    # normalize the distribution for the gaussian fit
-    max_y = np.float(np.max(bin_values))
-    normal_y = bin_values/max_y
-    max_x = np.float(np.max(bin_boundaries))
-    normal_x = bin_boundaries[:-1]/max_x
-
-    # Fit the data with the gaussian modelling function and rescale the parameters
-    fit, _ = curve_fit(mylib.modelling_function, normal_x, normal_y)
-    background = fit[1] * max_x
-    dispersion = math.fabs(fit[2] * max_x)
-    threshold = background + 6.0 * dispersion
-
-    # Initiate some variables
-    pixels_shape = pixels.shape
-    marks = np.zeros(pixels_shape)
-    n_row, n_column = pixels_shape
-    cluster_array = []
-
-    # Loop over the pixels and put the list of cluster in cluster_array
-    for i in range(n_row):
-        for j in range(n_column):
-            if marks[i][j] != 1:
-                marks[i][j] = 1
-                if pixels[i][j] >= threshold:
-                    cluster = mylib.Cluster(pixels, marks, threshold)
-                    cluster.cluster_exploration(i, j)
-                    marks = cluster.marks_updater()
-                    cluster_array.append(cluster)
-
-    # Instantiate conversion object
-    my_wcs = library.WCS(header)
-
-    # Compute WCS coordinates for the image corners
-    #corner_pixel = [(0, 0), (0, n_row - 1), (n_column - 1, 0), (n_column - 1, n_row - 1)]
-    #corner_celestial = [my_wcs.convert_to_radec(x, y) for x, y in corner_pixel]
-
-    # Compute WCS coordinates for every cluster centroid
-    for cluster in cluster_array:
-        pixel_coords = cluster.centroid_pixel
-        cluster.centroid_WCS = my_wcs.convert_to_radec(pixel_coords[0], pixel_coords[1])
-
-    # remove the background
-    above = pixels >= threshold
-    filtered_pixels = above * (pixels - background)
+    # Get the list of clusters
+    my_wcs = library.WCS(header) # Instantiate WCS conversion object
+    cluster_array = mylib.get_cluster_array(pixels, background, \
+                                            dispersion, my_wcs)
+    
+    # Remove the background
+    filtered_pixels = mylib.remove_background(pixels, background, dispersion)
 
     # Display the picture
     fig, axis = plt.subplots()
     axis.imshow(filtered_pixels)
 
-    # Put all cluster celestial coordinates
-    #for cluster in cluster_array:
-    #    axis.text(cluster.centroid_pixel[0],  cluster.centroid_pixel[1], \
-    #              'ra: %.10f, dec: %.10f' % \
-    #              (cluster.centroid_WCS[0], cluster.centroid_WCS[1]), \
-    #              fontsize=14, color='white')
-
-    # Move definition
+    # Move function definition
     def move(event):
         x_position = event.xdata
         y_position = event.ydata
-        if x_position != None: # We are not outside the picture
+        if x_position != None: # if we are not outside the picture
 	    ra, dec = my_wcs.convert_to_radec(x_position, y_position)
-            axis = event.inaxes
             text = axis.text(x_position, y_position, 'ra: %.6f, dec: %.6f' % \
                             (ra, dec), fontsize=14, color='white')
             event.canvas.draw()
@@ -106,18 +52,12 @@ def main():
     plt.show()
 
     # Find the celestial coordinates of the main cluster
-    greatest_integral = 0
-    centroid_coords = None
-    for cluster in cluster_array:
-        if cluster.integrated_luminosity > greatest_integral:
-            greatest_integral = cluster.integrated_luminosity
-            centroid_coords = cluster.centroid_pixel
-    main_cluster_ra, main_cluster_dec = \
-        my_wcs.convert_to_radec(centroid_coords[0], centroid_coords[1])
+    greatest_integral, centroid = mylib.find_main_centroid(cluster_array, \
+                                                           wcs = True)
 
-    # Write the informations of the transformation matrix on ex4.txt file
+    # Write informations about WCS coordinates on ex4.txt file
     results = 'right ascension: %.3f, declination: %.3f' % \
-             (main_cluster_ra, main_cluster_dec)
+             (centroid[0], centroid[1])
     with open("ex4.txt", 'w') as output_file:
         output_file.write(results)
 
