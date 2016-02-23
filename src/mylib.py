@@ -58,7 +58,7 @@ def modelling_parameters(pixels):
 
     return x, y, maxvalue, background, dispersion
 
-def remove_background(pixels, background, dispersion):
+def remove_background(pixels, background, dispersion, threshold = None):
     """
     Remove the background of the picture
     :param pixels: 2D array corresponding to the picture
@@ -66,7 +66,8 @@ def remove_background(pixels, background, dispersion):
     :param dispersion: dispersion in the background value
     :return: 2D array corresponding to the picture in which the backgroud has been removed
     """
-    threshold = background + 6 * dispersion
+    if threshold == None:
+        threshold = background + 6.0 * dispersion
     above = pixels >= threshold
     return above * (pixels - background)
 

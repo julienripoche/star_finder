@@ -94,7 +94,7 @@ def main():
                                  fill=False, \
                                  color='white'))
 
-     # On_click definition
+    # On_click definition
     def on_click(event):
         x_position = event.xdata
         y_position = event.ydata
