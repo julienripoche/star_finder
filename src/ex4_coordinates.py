@@ -28,7 +28,7 @@ def main():
     my_wcs = library.WCS(header) # Instantiate WCS conversion object
     cluster_array = mylib.get_cluster_array(pixels, background, \
                                             dispersion, my_wcs)
-    
+
     # Remove the background
     filtered_pixels = mylib.remove_background(pixels, background, dispersion)
 
@@ -38,12 +38,17 @@ def main():
 
     # Move function definition
     def move(event):
+        """
+        Function called when the event 'motion_notify_event' occurs,
+        the wcs coordinates of the pixel pointed by the mouse are
+        then displayed at its location
+        """
         x_position = event.xdata
         y_position = event.ydata
         if x_position != None: # if we are not outside the picture
-	    ra, dec = my_wcs.convert_to_radec(x_position, y_position)
+            rad, dec = my_wcs.convert_to_radec(x_position, y_position)
             text = axis.text(x_position, y_position, 'ra: %.6f, dec: %.6f' % \
-                            (ra, dec), fontsize=14, color='white')
+                            (rad, dec), fontsize=14, color='white')
             event.canvas.draw()
             text.remove()
 
@@ -51,13 +56,12 @@ def main():
     fig.canvas.mpl_connect('motion_notify_event', move)
     plt.show()
 
-    # Find the celestial coordinates of the main cluster
-    greatest_integral, centroid = mylib.find_main_centroid(cluster_array, \
-                                                           wcs = True)
+    # Find the cluster with the greatest integral
+    main_clust = mylib.find_main_centroid(cluster_array)
 
     # Write informations about WCS coordinates on ex4.txt file
     results = 'right ascension: %.3f, declination: %.3f' % \
-             (centroid[0], centroid[1])
+              (main_clust.centroid_WCS[0], main_clust.centroid_WCS[1])
     with open("ex4.txt", 'w') as output_file:
         output_file.write(results)
 

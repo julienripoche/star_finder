@@ -78,6 +78,30 @@ class Cluster():
         """
         self.recursive_exploration(i, j)
 
+    def find_star_name(self):
+        """
+        Method to find the name of the celestial object
+        given by its WCS position
+        """
+        # Get the dictionnary of all objects in this region
+        celestial_objects = library.get_objects(self.centroid_WCS[0], \
+                                                self.centroid_WCS[1], 0.003)
+        
+	# If there is some objects in this region
+        if len(celestial_objects) != 0:
+            knowns_objs = {i:celestial_objects[i] for i in celestial_objects \
+                           if celestial_objects[i] != 'Unknown'}
+            if len(knowns_objs) != 0:
+                knowns_keys = sorted(knowns_objs.keys())
+                self.star_name = knowns_keys[0]
+            else:
+                unknowns = {i:celestial_objects[i] for i in celestial_objects \
+                            if celestial_objects[i] == 'Unknown'}
+                unknowns_keys = sorted(unknowns.keys())
+                self.star_name = unknowns_keys[0]
+        else: # is there is no object in this region
+            self.star_name = "Unfound"
+
     def find_centroid(self, my_wcs = None):
         """
         Method that find the centroid coordinates,
@@ -103,6 +127,7 @@ class Cluster():
             self.centroid_WCS = my_wcs.convert_to_radec( \
                                  self.centroid_pixel[0], \
                                  self.centroid_pixel[1])
+            self.find_star_name()
 
     def marks_updater(self):
         """
@@ -110,22 +135,6 @@ class Cluster():
         :return: new pixel marker
         """
         return self.marks
-
-    def find_star_name(self):
-        celestial_objects = library.get_objects(self.centroid_WCS[0], self.centroid_WCS[1], 0.003)
-        if len(celestial_objects) != 0:
-            non_unknowns = {i:celestial_objects[i] for i in celestial_objects \
-                            if celestial_objects[i] != 'Unknown'}
-            non_unknowns_keys = sorted(non_unknowns.keys())
-            if len(non_unknowns_keys) != 0:
-                self.star_name = non_unknowns_keys[0]
-            else:
-                unknowns = {i:celestial_objects[i] for i in celestial_objects \
-                            if celestial_objects[i] == 'Unknown'}
-                unknowns_keys = sorted(unknowns.keys())
-                self.star_name = unknowns_keys[0]
-        else:
-            self.star_name = "Unfound"
 
     def is_in_bounding(self, x_position, y_position):
         x_position = int(x_position)

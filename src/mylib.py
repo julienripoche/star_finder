@@ -114,11 +114,11 @@ def get_cluster_array(pixels, background, dispersion, my_wcs = None):
     # Return the array of clusters
     return cluster_array
 
-def find_main_centroid(cluster_array, wcs = False):
+def find_main_centroid(cluster_array):
     """
-    Find the centroid with the highest luminosity
+    Find the cluster with the highest luminosity
     :param cluster_array: contains clusters from the picture
-    :return: the highest luminosity, the coordinates of it
+    :return: the cluster of the highest luminosity
     """
 
     # Loop over the clusters to find to one with the highest luminosity
@@ -129,12 +129,7 @@ def find_main_centroid(cluster_array, wcs = False):
             greatest_integral = clust.integrated_luminosity
             main_centroid = i
 
-    # Find its coordinates
-    centroid_coords = cluster_array[main_centroid].centroid_WCS \
-                      if wcs else \
-                      cluster_array[main_centroid].centroid_pixel
-        
-    return greatest_integral, centroid_coords
+    return cluster_array[main_centroid]
 
 if __name__ == '__main__':
 

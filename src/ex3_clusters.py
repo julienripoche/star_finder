@@ -24,14 +24,14 @@ def main():
     # Get the list of clusters
     cluster_array = mylib.get_cluster_array(pixels, background, dispersion)
 
-    # Find the greatest integral and the associated centroid coordinates
-    greatest_integral, centroid = mylib.find_main_centroid(cluster_array)
+    # Find the cluster with the greatest integral
+    main_clust = mylib.find_main_centroid(cluster_array)
 
     # Write informations about clusters on ex3.txt file
     results = 'number of clusters: %2d, ' % (len(cluster_array)) \
-            + 'greatest integral: %7d, ' % (greatest_integral) \
+            + 'greatest integral: %7d, ' % (main_clust.integrated_luminosity) \
             + 'centroid x: %4.1f, centroid y: %4.1f' % \
-              (centroid[0], centroid[1])
+              (main_clust.centroid_pixel[0], main_clust.centroid_pixel[1])
     with open("ex3.txt", 'w') as output_file:
         output_file.write(results)
 
