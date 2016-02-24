@@ -28,7 +28,7 @@ def main():
     # Get the list of clusters
     my_wcs = library.WCS(header) # Instantiate WCS conversion object
     cluster_array = mylib.get_cluster_array(pixels, background, \
-                                            dispersion, my_wcs)
+                                            dispersion, my_wcs=my_wcs)
 
     # Remove the background
     filtered_pixels = mylib.remove_background(pixels, background, dispersion)

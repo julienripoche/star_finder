@@ -104,7 +104,10 @@ def get_cluster_array(pixels, background, dispersion, threshold=None, my_wcs=Non
                 if pixels[i][j] >= threshold: # if luminosity > threshold
                     clust = Cluster()
                     clust.recursive_exploration(i, j, pixels, marks, threshold)
-                    clust.find_centroid(my_wcs)
+                    if my_wcs != None:
+                        clust.find_centroid(my_wcs=my_wcs)
+                    else:
+                        clust.find_centroid()
                     cluster_array.append(clust)
 
     # Return the array of clusters
