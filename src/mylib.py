@@ -74,12 +74,12 @@ def remove_background(pixels, background, dispersion, threshold=None):
     :param threshold: set another value for the threshold
     :return: 2D array in which the backgroud has been removed
     """
-    if threshold == None: # if the threshold is not already defined
+    if threshold is None: # if the threshold is not already defined
         threshold = background + 6.0 * dispersion
     above = pixels >= threshold
     return above * (pixels - background)
 
-def get_cluster_array(pixels, background, dispersion, my_wcs=None):
+def get_cluster_array(pixels, background, dispersion, threshold=None, my_wcs=None):
     """
     Find the list of clusters in the picture pixels
     according to a threshold defines with background and dispersion
@@ -90,7 +90,8 @@ def get_cluster_array(pixels, background, dispersion, my_wcs=None):
     """
 
     # Initiate some variables before looping over all pixels
-    threshold = background + 6.0 * dispersion # threshold value
+    if threshold is None:
+        threshold = background + 6.0 * dispersion # threshold value
     marks = np.zeros(pixels.shape) # to mark each pixels
     n_row, n_column = pixels.shape
     cluster_array = [] # will contain instances of the class Cluster

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """Print message 'Hello, world!'.mv
-
 :Author: LAL npacxx <npacxx@lal.in2p3.fr>
 :Date:   February 2016
 """
@@ -14,7 +13,6 @@ import sys
 def print_msg(string=None):
     """Print a message received as an argument or a default message
     if none is passed.
-
     :param string: a string to print (optional)
     :return: status value (always success, 0)
     """
@@ -27,7 +25,6 @@ def print_msg(string=None):
 
 def print_text(text_list):
     """Print a message from a list of strings
-
     :param text_list: a list of string to print
     :return: status value (always success, 0)
     """
@@ -39,7 +36,6 @@ def print_text(text_list):
 
 def merge_text(text_list):
     """Print a message, merging it, from a list of strings
-
     :param text_list: a list of string to print
     :return: status value (always success, 0)
     """
@@ -55,7 +51,6 @@ def merge_text(text_list):
 
 def enter_text():
     """Take a message entered by the user until the key word '***'
-
     :return: the message, which is a list of strings
     """
 
